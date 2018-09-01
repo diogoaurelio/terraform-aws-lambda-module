@@ -16,4 +16,4 @@ Optional:
 
 # Authors/Contributors
 
-See the list of [contributors](https://github.com/diogoaurelio//graphs/contributors) who participated in this project.
+See the list of [contributors](https://github.com/diogoaurelio/terraform-aws-lambda-module/graphs/contributors) who participated in this project.
