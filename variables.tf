@@ -74,10 +74,6 @@ variable "attach_policy" {
   default     = false
 }
 
-variable "kms_key_arn" {
-  description = "ARN to the KMS key which lambda should be using to decrypt and encrypt environmental variables"
-}
-
 variable "ssm_param_resource_arn" {
   description = "ARN of SSM parameter to retrieve; for example, DB password"
   default     = "*"
