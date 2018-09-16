@@ -79,7 +79,7 @@ variable "attach_policy" {
   default     = false
 }
 
-variable "logs_kms_key_arn" {
+variable "kms_key_arn" {
   description = "ARN to the KMS key which lambda should be using to decrypt and encrypt environmental variables"
 }
 

@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "this_logs" {
     ]
 
     resources = [
-      "${var.logs_kms_key_arn}",
+      "${var.kms_key_arn}",
     ]
   }
 }
