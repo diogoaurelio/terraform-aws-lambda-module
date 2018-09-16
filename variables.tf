@@ -2,17 +2,12 @@ variable "aws_region" {
   description = "AWS Region"
 }
 
-variable "aws_account_id" {
-  description = "AWS Account ID"
-}
-
 variable "environment" {
-  description = "Environment of the Stack"
-  default     = "dev"
+  description = "Environment of the Stack, used for resource naming convention purposes"
 }
 
 variable "project" {
-  default = "redshift-loader"
+  default = "Project name, used for resource naming convention purposes"
 }
 
 variable "output_lambda_zip" {
@@ -109,9 +104,7 @@ variable "subnet_ids" {
   default     = []
 }
 
-variable "dead_letter_config_target_arn" {
-  default = "abc"
-}
+variable "dead_letter_config_target_arn" {}
 
 variable "use_dead_letter_config_target_arn" {
   default = false

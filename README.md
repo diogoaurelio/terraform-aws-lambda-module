@@ -24,34 +24,66 @@ module "lambda" {
     source = "github.com/diogoaurelio/terraform-aws-lambda-module"
     version = "v0.0.2"
     
-    aws_region     = "${var.aws_region}"
-    aws_account_id = "${var.account_id}"
-    environment    = "${var.environment}"
-    project        = "${var.project}"
+    aws_region     = "eu-west-1"
+    aws_account_id = "012345678912"
+    environment    = "dev"
+    project        = "lambda"
     
-    lambda_unique_function_name = "${var.lambda_unique_function_name}"
-    runtime                     = "${var.lambda_runtime}"
-    handler                     = "${var.lambda_handler}"
-    lambda_iam_role_name        = "${var.lambda_role_name}"
-    logs_kms_key_arn            = "${module.logs_bucket.aws_kms_key_arn}"
+    lambda_unique_function_name = "uniquelambda"
+    runtime                     = "python3.6"
+    handler                     = "handler"
+    lambda_iam_role_name        = "uniquelambdarole"
     
-    main_lambda_file  = "${var.redshift_loader_main_lambda_file}"
-    lambda_source_dir = "${local.lambda_source_dir}"
+    main_lambda_file  = "main"
     
-    lambda_zip_file_location = "${var.lambda_zip_file_localtion}"
-    lambda_env_vars          = "${var.lambda_env_vars}"
+    # These next paths is specific to the one used in blog post series: https://datacenternotes.com/2018/09/01/aws-server-less-data-pipelines-with-terraform-part-1/
+    lambda_source_dir = "${path.cwd}/../../../etl/lambda/redshift/src"
+    lambda_zip_file_location = "${path.cwd}/../../../etl/lambda/redshift/src/main.zip"
+    
+    lambda_env_vars          = "${local.lambda_env_vars}"
     
     additional_policy = "${data.aws_iam_policy_document.additional_lambda_policy.json}"
     attach_policy     = true
     
     # configure Lambda function inside a specific VPC
-    security_group_ids = ["${var.lamda_security_group}"]
-    subnet_ids         = ["${var.lamda_subnet_ids)}"]
+    security_group_ids = ["sg-012345678"]
+    subnet_ids         = ["subnet-12345678"]
     
     # DLQ
     use_dead_letter_config_target_arn = true
-    dead_letter_config_target_arn     = "${var.lambda_sns_dql.arn}"
+    dead_letter_config_target_arn     = "${aws_sns_topic.lambda_sns_dql.arn}"
 }
+
+# Locals used to specify lambda ENVIRONMENT variables
+locals {
+
+  lambda_env_vars = {
+    ENVIRONMENT = "${var.environment}"
+    REGION      = "${var.aws_region}"
+  }
+}
+
+# optional additional policy document
+data "aws_iam_policy_document" "additional_lambda_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListAllMyBuckets",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+}
+
+## SNS topic for lambda failures - Dead Letter Queue (DLQ)
+resource "aws_sns_topic" "lambda_sns_dql" {
+  name = "lambda-dlq-sns-topic"
+}
+
 
 ```
 

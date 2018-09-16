@@ -1,3 +1,27 @@
+################################################################################
+# Lambda KMS key used to encrypt Lambda Environmental Variables
+################################################################################
+
+resource "aws_kms_key" "lambda_env_vars_key" {
+  description             = "Used to encrypt Lambda function environmental variables"
+  is_enabled              = true
+  key_usage               = "ENCRYPT_DECRYPT"
+  deletion_window_in_days = "30"
+
+  tags {
+    Environment = "${var.environment}"
+    Project     = "${var.project}"
+    Name        = "${var.lambda_unique_function_name}-lambda-env-vars-key"
+  }
+}
+
+resource "aws_kms_alias" "lambda_env_vars_key_alias" {
+  name          = "alias/${var.environment}-${var.project}-lambda-env-vars-key"
+  target_key_id = "${aws_kms_key.lambda_env_vars_key.arn}"
+}
+
+
+
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "${var.lambda_source_dir}"
@@ -18,7 +42,7 @@ resource "aws_lambda_function" "lambda" {
   timeout          = "${var.timeout}"
   memory_size      = "${var.memory_size}"
   publish          = "${var.publish}"
-  kms_key_arn      = "${var.kms_key_arn}"
+  kms_key_arn      = "${aws_kms_key.lambda_env_vars_key.arn}"
 
   environment {
     variables = "${var.lambda_env_vars}"
@@ -45,7 +69,7 @@ resource "aws_lambda_function" "lambda_with_dlq" {
   timeout          = "${var.timeout}"
   memory_size      = "${var.memory_size}"
   publish          = "${var.publish}"
-  kms_key_arn      = "${var.kms_key_arn}"
+  kms_key_arn      = "${aws_kms_key.lambda_env_vars_key.arn}"
 
   dead_letter_config {
     target_arn = "${var.dead_letter_config_target_arn}"
@@ -76,7 +100,7 @@ resource "aws_lambda_function" "lambda_with_vpc" {
   timeout          = "${var.timeout}"
   memory_size      = "${var.memory_size}"
   publish          = "${var.publish}"
-  kms_key_arn      = "${var.kms_key_arn}"
+  kms_key_arn      = "${aws_kms_key.lambda_env_vars_key.arn}"
 
   vpc_config {
     security_group_ids = ["${var.security_group_ids}"]
@@ -108,7 +132,7 @@ resource "aws_lambda_function" "lambda_with_vpc_and_dlq" {
   timeout          = "${var.timeout}"
   memory_size      = "${var.memory_size}"
   publish          = "${var.publish}"
-  kms_key_arn      = "${var.kms_key_arn}"
+  kms_key_arn      = "${aws_kms_key.lambda_env_vars_key.arn}"
 
   vpc_config {
     security_group_ids = ["${var.security_group_ids}"]
