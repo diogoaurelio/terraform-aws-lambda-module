@@ -22,7 +22,7 @@ Example usage:
 ```hcl
 module "lambda" {
     source = "github.com/diogoaurelio/terraform-aws-lambda-module"
-    version = "v0.0.1"
+    version = "v0.0.2"
     
     aws_region     = "${var.aws_region}"
     aws_account_id = "${var.account_id}"
